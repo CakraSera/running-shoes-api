@@ -8,16 +8,16 @@ app.get("/", (c) => {
 });
 
 app.get("/shoes", (c) => {
-  return c.json({ data: shoes });
+  return c.json(shoes);
 });
 
 app.get("/shoes/:id", (c) => {
   const id = parseInt(c.req.param("id"));
   const shoe = shoes.find((s) => s.id === id);
   if (!shoe) {
-    return c.json({ message: "Shoe not found" }, 404);
+    return c.json(404);
   }
-  return c.json({ data: shoe });
+  return c.json(shoe);
 });
 
 export default app;
