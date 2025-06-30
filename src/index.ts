@@ -39,7 +39,7 @@ app.post(
     }
   }),
   async (c) => {
-    const newShoe = await c.req.valid("json");
+    const newShoe = c.req.valid("json");
     const id = nanoid();
     const newShoes: Shoe[] = [
       ...shoes,
