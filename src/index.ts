@@ -2,17 +2,11 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { nanoid } from "nanoid";
-import { dataShoes, Shoe } from "../data/shoes";
+import { dataShoes, ShoeSchema, Shoe } from "../data/shoes";
 
 let shoes = dataShoes;
 
 const app = new Hono();
-
-const createPostSchema = z.object({
-  name: z.string().min(3).max(100),
-  description: z.string().min(3).max(100),
-  brand: z.string().min(3).max(100),
-});
 
 app.get("/", (c) => {
   return c.json({ message: "Hello, Hono!" });
@@ -33,13 +27,13 @@ app.get("/shoes/:id", (c) => {
 
 app.post(
   "/shoes",
-  zValidator("json", createPostSchema, (result, c) => {
+  zValidator("json", ShoeSchema, (result, c) => {
     if (!result.success) {
       return c.text("Invalid!", 400);
     }
   }),
-  async (c) => {
-    const newShoe = await c.req.valid("json");
+  (c) => {
+    const newShoe = c.req.valid("json");
     const id = nanoid();
     const newShoes: Shoe[] = [
       ...shoes,
@@ -54,5 +48,12 @@ app.post(
     return c.json(newShoes);
   }
 );
+
+app.delete("/shoes/:id", (c) => {
+  const id = c.req.param("id") as string;
+  const bufferShoes = shoes.filter((shoe) => shoe.id !== id);
+  shoes = bufferShoes;
+  return c.json(shoes);
+});
 
 export default app;
