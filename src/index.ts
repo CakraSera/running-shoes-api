@@ -61,4 +61,9 @@ app.delete("/shoes/:id", (c) => {
   return c.json(shoes);
 });
 
+app.patch("/shoes/:id", (c) => {
+  const id = c.req.param("id") as string;
+  const shoe = shoes.filter((shoe) => shoe.id === id);
+});
+
 export default app;
