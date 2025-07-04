@@ -49,6 +49,11 @@ app.post(
   }
 );
 
+app.delete("/shoes", (c) => {
+  shoes = [];
+  return c.json(shoes);
+});
+
 app.delete("/shoes/:id", (c) => {
   const id = c.req.param("id") as string;
   const bufferShoes = shoes.filter((shoe) => shoe.id !== id);
