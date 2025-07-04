@@ -16,7 +16,8 @@ export const dataShoes: Shoe[] = [
     id: "hbNDaISSQ9b-ZJlqJNtyK",
     name: "Nike Air Max",
     description: "A comfortable and stylish running shoe.",
-    imageUrl: "https://example.com/nike-air-max.jpg",
+    imageUrl:
+      "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/6a3671b8-f115-44f6-9ab6-3798d55210eb/custom-nike-air-max-97-shoes-by-you.png",
     brand: "Nike",
   },
   {
@@ -43,8 +44,7 @@ export const dataShoes: Shoe[] = [
   {
     id: "dTlvQLiqYxxqzcI1gQB7Y",
     name: "New Balance 990",
-    description:
-      "Premium running shoes known for their comfort and durability.",
+    description: "Premium running shoes known for their comfort and durability.",
     imageUrl: "https://example.com/new-balance-990.jpg",
     brand: "New Balance",
   },
