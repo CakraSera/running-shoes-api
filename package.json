@@ -7,6 +7,7 @@
   "dependencies": {
     "@hono/zod-openapi": "^0.19.8",
     "@hono/zod-validator": "^0.7.0",
+    "@prisma/client": "^6.11.1",
     "@types/pg": "^8.15.4",
     "hono": "^4.8.3",
     "nanoid": "^5.1.5",
@@ -14,6 +15,10 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^24.0.10",
+    "prisma": "^6.11.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
   }
 }
