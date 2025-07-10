@@ -8,4 +8,7 @@ await client.connect();
 
 const res = await client.query("SELECT * FROM Brands");
 
+const dataBrands = res.rows;
+console.log({ dataBrands });
+
 await client.end();
