@@ -2,8 +2,10 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { nanoid } from "nanoid";
 import { dataShoes, ShoeSchema, Shoe } from "../data/shoes";
-
-console.log(process.env.DATABASE_URL);
+import { PrismaClient } from "./generated/prisma";
+const prisma = new PrismaClient({
+  log: ["query"],
+});
 
 let shoes = dataShoes;
 
@@ -13,7 +15,9 @@ app.get("/", (c) => {
   return c.json({ message: "Hello, Hono!" });
 });
 
-app.get("/shoes", (c) => {
+app.get("/shoes", async (c) => {
+  const shoes = await prisma.shoes.findMany();
+  console.log("🚀 ~ app.get ~ shoes:", shoes);
   return c.json(shoes);
 });
 
