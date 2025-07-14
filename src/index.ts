@@ -33,33 +33,24 @@ app.get("/shoes/:id", async (c) => {
   return c.json(shoe);
 });
 
-app.post(
-  "/shoes",
-  zValidator("json", ShoeSchema, (result, c) => {
-    if (!result.success) {
-      console.log("🚀 ~ zValidator ~ result:", result);
-      return c.text("Invalid!", 400);
-    }
-  }),
-  (c) => {
-    const newShoe = c.req.valid("json");
-    console.log("🚀 ~ newShoe:", newShoe);
-    const shoeData = prisma.shoes.create({
-      data: {
-        name: newShoe.name,
-        brandId: newShoe.brandId,
-        generation: newShoe.generation,
-        releaseDate: newShoe.releaseDate,
-        description: newShoe.description,
-        category: newShoe.category,
-        terrain: newShoe.terrain,
-        bestFor: newShoe.bestFor,
-        imageUrl: newShoe.imageUrl,
-      },
-    });
-    return c.json(shoeData);
-  }
-);
+app.post("/shoes", zValidator("json", ShoeSchema), (c) => {
+  const newShoe = c.req.valid("json");
+  console.log("🚀 ~ newShoe:", newShoe);
+  const shoeData = prisma.shoes.create({
+    data: {
+      name: newShoe.name,
+      brandId: newShoe.brandId,
+      generation: newShoe.generation,
+      releaseDate: newShoe.releaseDate,
+      description: newShoe.description,
+      category: newShoe.category,
+      terrain: newShoe.terrain,
+      bestFor: newShoe.bestFor,
+      imageUrl: newShoe.imageUrl,
+    },
+  });
+  return c.json(shoeData);
+});
 
 app.delete("/shoes", async (c) => {
   const deleteShoes = await prisma.shoes.deleteMany({});
@@ -77,22 +68,14 @@ app.delete("/shoes/:id", async (c) => {
 });
 
 // TODO: Implement PATCH endpoint using zod validation and prisma
-app.patch(
-  "/shoes/:id",
-  zValidator("json", ShoeSchema, (result, c) => {
-    if (!result.success) {
-      return c.text("Invalid!", 404);
-    }
-  }),
-  (c) => {
-    const id = c.req.param("id") as string;
-    return c.json(
-      prisma.shoes.update({
-        where: { id },
-        data: c.req.valid("json"),
-      })
-    );
-  }
-);
+app.patch("/shoes/:id", zValidator("json", ShoeSchema), (c) => {
+  const id = c.req.param("id") as string;
+  return c.json(
+    prisma.shoes.update({
+      where: { id },
+      data: c.req.valid("json"),
+    })
+  );
+});
 
 export default app;
