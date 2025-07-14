@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { z } from "zod";
 
 export const ShoeSchema = z.object({

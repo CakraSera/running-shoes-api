@@ -3,6 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "build": "bun install && prisma migrate deploy && prisma generate",
     "start": "bun run src/index.ts",
     "db:up": "docker compose up -d",
     "db:migrate": "prisma migrate dev",
