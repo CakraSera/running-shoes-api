@@ -57,16 +57,19 @@ app.post(
   }
 );
 
-app.delete("/shoes", (c) => {
-  shoes = [];
-  return c.json(shoes);
+app.delete("/shoes", async (c) => {
+  const deleteShoes = await prisma.shoes.deleteMany({});
+  return c.json(deleteShoes);
 });
 
-app.delete("/shoes/:id", (c) => {
-  const id = c.req.param("id") as string;
-  const bufferShoes = shoes.filter((shoe) => shoe.id !== id);
-  shoes = bufferShoes;
-  return c.json(shoes);
+app.delete("/shoes/:id", async (c) => {
+  const id = c.req.param("id");
+  const deleteShoes = await prisma.shoes.delete({
+    where: {
+      id,
+    },
+  });
+  return c.json(deleteShoes);
 });
 
 app.patch(
