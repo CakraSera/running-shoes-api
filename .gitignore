@@ -1,4 +1,5 @@
 # deps
 node_modules/
 .env
+.env.prod
 /src/generated/prisma

@@ -10,7 +10,9 @@ const prisma = new PrismaClient({
 const app = new Hono();
 
 app.get("/", (c) => {
-  return c.json({ message: "Hello, Hono!" });
+  return c.json({
+    message: "Welcome to the Running Shoes API",
+  });
 });
 
 app.get("/shoes", async (c) => {
@@ -74,6 +76,7 @@ app.delete("/shoes/:id", async (c) => {
   return c.json(deleteShoes);
 });
 
+// TODO: Implement PATCH endpoint using zod validation and prisma
 app.patch(
   "/shoes/:id",
   zValidator("json", ShoeSchema, (result, c) => {
@@ -83,8 +86,12 @@ app.patch(
   }),
   (c) => {
     const id = c.req.param("id") as string;
-    const updat
-    return c.json(updatedShoes);
+    return c.json(
+      prisma.shoes.update({
+        where: { id },
+        data: c.req.valid("json"),
+      })
+    );
   }
 );
 
