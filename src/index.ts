@@ -17,13 +17,16 @@ app.get("/", (c) => {
 
 app.get("/shoes", async (c) => {
   const shoes = await prisma.shoes.findMany();
-  console.log("🚀 ~ app.get ~ shoes:", shoes);
   return c.json(shoes);
 });
 
-app.get("/shoes/:id", (c) => {
+app.get("/shoes/:id", async (c) => {
   const id = c.req.param("id");
-  const shoe = shoes.find((shoe) => shoe.id === id);
+  const shoe = await prisma.shoes.findUnique({
+    where: {
+      id: id,
+    },
+  });
   if (!shoe) {
     return c.json(404);
   }
