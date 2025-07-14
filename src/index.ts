@@ -1,18 +1,17 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { nanoid } from "nanoid";
-import { dataShoes, ShoeSchema, Shoe } from "../data/shoes";
+
+import { ShoeSchema } from "../data/shoes";
 import { PrismaClient } from "./generated/prisma";
+
 const prisma = new PrismaClient({
   log: ["query"],
 });
 
-let shoes = dataShoes;
-
 const app = new Hono();
 
 app.get("/", (c) => {
-  return c.json({ message: "Hello, Hono!" });
+  return c.json({ message: "Shoes API" });
 });
 
 app.get("/shoes", async (c) => {
@@ -42,18 +41,8 @@ app.post(
   }),
   (c) => {
     const newShoe = c.req.valid("json");
-    const id = nanoid();
-    const newShoes: Shoe[] = [
-      ...shoes,
-      {
-        id,
-        name: newShoe.name,
-        description: newShoe.description,
-        brand: newShoe.brand,
-      },
-    ];
-    shoes = newShoes;
-    return c.json(newShoes);
+
+    return c.json({});
   }
 );
 
@@ -86,9 +75,7 @@ app.patch(
       return c.json(404);
     }
     const updatedShoe = c.req.valid("json");
-    const updatedShoes = shoes.map((shoe) =>
-      shoe.id === id ? { ...shoe, ...updatedShoe } : shoe
-    );
+    const updatedShoes = shoes.map((shoe) => (shoe.id === id ? { ...shoe, ...updatedShoe } : shoe));
     shoes = updatedShoes;
     return c.json(updatedShoes);
   }
