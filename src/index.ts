@@ -18,6 +18,10 @@ app.get("/", (c) => {
 
 app.get("/shoes", async (c) => {
   const shoes = await prisma.shoes.findMany({
+    relationLoadStrategy: "join",
+    orderBy: {
+      name: "asc", // Order by shoe name
+    },
     include: {
       Brand: true, // Include brand information
     },
@@ -28,6 +32,10 @@ app.get("/shoes", async (c) => {
 app.get("/shoes/:id", async (c) => {
   const id = c.req.param("id");
   const shoe = await prisma.shoes.findUnique({
+    relationLoadStrategy: "join",
+    include: {
+      Brand: true, // Include brand information
+    },
     where: {
       id: id,
     },
