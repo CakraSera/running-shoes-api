@@ -12,6 +12,9 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio --browser none"
   },
+  "prisma": {
+    "seed": "bun prisma/seed.ts"
+  },
   "dependencies": {
     "@hono/zod-openapi": "^0.19.8",
     "@hono/zod-validator": "^0.7.0",
@@ -20,7 +23,7 @@
     "hono": "^4.8.3",
     "nanoid": "^5.1.5",
     "pg": "^8.16.3",
-    "zod": "^3.25.67"
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/bun": "latest",

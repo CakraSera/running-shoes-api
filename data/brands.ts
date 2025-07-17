@@ -151,4 +151,14 @@ export const dataBrands: Brand[] = [
     logoUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Merrell_logo.svg/1200px-Merrell_logo.svg.png",
   },
+  {
+    id: 15,
+    name: "910 Running",
+    description:
+      "Innovative running shoe brand known for its advanced cushioning technology and lightweight designs, popular among trail and road runners.",
+    website_url: "https://www.910running.com",
+    founded_year: 2015,
+    logoUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/910_Running_logo.svg/1200px-910_Running_logo.svg.png",
+  },
 ];
