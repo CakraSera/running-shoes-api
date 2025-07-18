@@ -1,14 +1,32 @@
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import slugify from "slugify";
 import { getAllShoeWithBrand } from "./generated/prisma/sql";
 import { zValidator } from "./validator-wrapper";
 import { ShoeSchema } from "../data/shoes";
-import { PrismaClient } from "./generated/prisma";
-import slugify from "slugify";
+import { PrismaClient, Prisma } from "./generated/prisma";
 const prisma = new PrismaClient({
   log: ["query"],
 });
 
 const app = new Hono();
+
+app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    console.log("HTTPException", err);
+    return err.getResponse();
+  }
+
+  if (err instanceof Error) {
+    console.log("Error", err);
+    return err.toString();
+  }
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    console.log("PrismaClientKnownRequestError", err);
+    return c.json({ error: "Database error occurred" }, 500);
+  }
+});
 
 app.get("/", (c) => {
   return c.json({
