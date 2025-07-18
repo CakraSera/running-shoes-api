@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 async function insertShoes() {
   for (const shoe of shoes) {
-    await prisma.shoes.create({
+    await prisma.shoes.upsert({
       data: {
         brandId: shoe.brandId,
         name: shoe.name,

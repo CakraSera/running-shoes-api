@@ -1,4 +1,5 @@
 SELECT
+    s.id,
     s.name,
 	s.generation,
 	s."releaseDate",
