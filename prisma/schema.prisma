@@ -17,7 +17,8 @@ datasource db {
 
 model Brand {
   id          Int      @id @default(autoincrement())  
-  name        String
+  slug        String   @unique
+  name        String   @unique
   description String?
   website_url String?
   founded_year Int?
@@ -31,7 +32,8 @@ model Shoes {
   id          String      @id @default(cuid())
   brandId     Int 
   Brand       Brand       @relation(fields: [brandId], references: [id])
-  name        String
+  name        String      @unique
+  slug        String      @unique
   generation  Int
   releaseDate  DateTime
   description String?

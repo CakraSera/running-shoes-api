@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const BrandSchema = z.object({
   id: z.number().int().positive(),
+  slug: z.string().min(3).max(100).optional(),
   name: z.string().min(1).max(100),
   description: z.string().min(1).max(500).optional(),
   website_url: z.string().url().optional(),
@@ -14,6 +15,7 @@ export type Brand = z.infer<typeof BrandSchema>;
 export const dataBrands: Brand[] = [
   {
     id: 1,
+    slug: "salomon",
     name: "Salomon",
     description:
       "French outdoor sports equipment company specializing in trail running and hiking gear.",
@@ -24,6 +26,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 2,
+    slug: "asics",
     name: "ASICS",
     description:
       "Japanese multinational corporation which produces footwear and sports equipment.",
@@ -34,6 +37,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 3,
+    slug: "nike",
     name: "Nike",
     description:
       "American multinational corporation that is engaged in the design, development, manufacturing, and worldwide marketing of footwear.",
@@ -44,6 +48,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 4,
+    slug: "adidas",
     name: "Adidas",
     description:
       "German multinational corporation, founded and headquartered in Herzogenaurach, Germany, that designs and manufactures shoes, clothing and accessories.",
@@ -54,6 +59,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 5,
+    slug: "puma",
     name: "Puma",
     description:
       "German multinational corporation that designs and manufactures athletic and casual footwear, apparel and accessories.",
@@ -64,6 +70,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 6,
+    slug: "reebok",
     name: "Reebok",
     description:
       "British-American footwear and apparel company that is a subsidiary of Authentic Brands Group.",
@@ -74,6 +81,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 7,
+    slug: "new-balance",
     name: "New Balance",
     description:
       "American multinational corporation that designs and manufactures athletic shoes and apparel.",
@@ -84,6 +92,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 8,
+    slug: "brooks",
     name: "Brooks",
     description:
       "American sports equipment company that designs and markets running shoes, clothing and accessories.",
@@ -94,6 +103,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 9,
+    slug: "saucony",
     name: "Saucony",
     description:
       "American athletic shoe company that specializes in running shoes.",
@@ -104,6 +114,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 10,
+    slug: "hoka",
     name: "Hoka",
     description:
       "American footwear company that designs and manufactures running shoes.",
@@ -114,6 +125,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 11,
+    slug: "mizuno",
     name: "Mizuno",
     description: "Japanese sports equipment and sportswear company.",
     website_url: "https://www.mizuno.com",
@@ -123,6 +135,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 12,
+    slug: "under-armour",
     name: "Under Armour",
     description:
       "American sports equipment company that manufactures footwear, sports and casual apparel.",
@@ -133,6 +146,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 13,
+    slug: "altra",
     name: "Altra",
     description:
       "American footwear company that specializes in running shoes with a foot-shaped toe box.",
@@ -143,6 +157,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 14,
+    slug: "merrell",
     name: "Merrell",
     description:
       "American footwear company that specializes in hiking and outdoor footwear.",
@@ -153,6 +168,7 @@ export const dataBrands: Brand[] = [
   },
   {
     id: 15,
+    slug: "910-running",
     name: "910 Running",
     description:
       "Innovative running shoe brand known for its advanced cushioning technology and lightweight designs, popular among trail and road runners.",

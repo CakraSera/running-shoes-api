@@ -1,6 +1,7 @@
 SELECT
     s.id,
     s.name,
+    s.slug,
 	s.generation,
 	s."releaseDate",
 	s.description,

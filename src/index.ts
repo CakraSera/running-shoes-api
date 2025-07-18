@@ -3,6 +3,7 @@ import { getAllShoeWithBrand } from "./generated/prisma/sql";
 import { zValidator } from "./validator-wrapper";
 import { ShoeSchema } from "../data/shoes";
 import { PrismaClient } from "./generated/prisma";
+import slugify from "slugify";
 const prisma = new PrismaClient({
   log: ["query"],
 });
@@ -19,18 +20,19 @@ app.get("/", (c) => {
 
 app.get("/shoes", async (c) => {
   const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());
+  console.log("🚀 ~ app.get ~ shoes:", shoes);
   return c.json(shoes);
 });
 
-app.get("/shoes/:id", async (c) => {
-  const id = c.req.param("id");
+app.get("/shoes/:slug", async (c) => {
+  const slug = c.req.param("slug");
   const shoe = await prisma.shoes.findUnique({
     relationLoadStrategy: "join",
     include: {
       Brand: true, // Include brand information
     },
     where: {
-      id: id,
+      slug,
     },
   });
   if (!shoe) {
@@ -42,8 +44,10 @@ app.get("/shoes/:id", async (c) => {
 app.post("/shoes", zValidator("json", ShoeSchema), async (c) => {
   try {
     const newShoeData = c.req.valid("json");
+    const shoeSlug = slugify(newShoeData.name);
     const createdShoe = await prisma.shoes.create({
       data: {
+        slug: shoeSlug,
         brandId: newShoeData.brandId,
         name: newShoeData.name,
         generation: newShoeData.generation,
