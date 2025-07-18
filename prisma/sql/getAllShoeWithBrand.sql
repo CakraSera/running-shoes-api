@@ -11,6 +11,6 @@ SELECT
 	s."imageUrl",
     	b.name AS brandName
 FROM
-    "Shoes" s
+    "Shoe" s
 JOIN 
     "Brand" b ON s."brandId" = b.id;
