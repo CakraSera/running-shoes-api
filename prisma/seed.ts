@@ -6,14 +6,13 @@ const prisma = new PrismaClient();
 
 async function insertShoes() {
   for (const shoe of dataShoes) {
-    await prisma.shoes.upsert({
+    await prisma.shoe.upsert({
       where: {
         name: shoe.name,
       },
       update: {},
       create: {
         slug: shoe.slug,
-        brandId: shoe.brandId,
         name: shoe.name,
         generation: shoe.generation,
         releaseDate: new Date(shoe.releaseDate),
@@ -22,6 +21,11 @@ async function insertShoes() {
         terrain: shoe.terrain,
         bestFor: shoe.bestFor,
         imageUrl: shoe.imageUrl,
+        brand: {
+          connect: {
+            slug: shoe.brandSlug,
+          },
+        },
       },
     });
   }
@@ -29,7 +33,7 @@ async function insertShoes() {
 
 async function main() {
   console.log("Starting seeding process...");
-  await prisma.shoes.deleteMany({});
+  await prisma.shoe.deleteMany({});
   await prisma.brand.deleteMany({});
   await prisma.brand.createMany({
     data: dataBrands,
