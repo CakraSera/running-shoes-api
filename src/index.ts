@@ -1,10 +1,17 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import slugify from "slugify";
+import * as Sentry from "@sentry/bun";
+
 import { getAllShoeWithBrand } from "./generated/prisma/sql";
 import { zValidator } from "./validator-wrapper";
-import { ShoeSchema } from "../data/shoes";
+import { CreateShoeSchema, ShoeSchema } from "../data/shoes";
 import { PrismaClient, Prisma } from "./generated/prisma";
+
+Sentry.init({
+  dsn: "https://2afa3a7f92d595d7c8ea32be448d2ed3@o4509690478329856.ingest.us.sentry.io/4509690482851840",
+});
+
 const prisma = new PrismaClient({
   log: ["query"],
 });
@@ -33,6 +40,11 @@ app.onError((err, c) => {
 });
 
 app.get("/", (c) => {
+  try {
+    throw new Error("Sentry Bun test");
+  } catch (e) {
+    Sentry.captureException(e);
+  }
   return c.json({
     ok: true,
     message: "Welcome to the Running Shoes API",
@@ -102,13 +114,12 @@ app.delete("/shoes/:id", async (c) => {
   return c.json(deleteShoes);
 });
 
-app.patch("/shoes/:id", zValidator("json", ShoeSchema), async (c) => {
+app.patch("/shoes/:id", zValidator("json", CreateShoeSchema), async (c) => {
   const id = c.req.param("id") as string;
   const bodyJson = c.req.valid("json");
   const updateShoe = await prisma.shoe.update({
     where: { id },
     data: {
-      brandId: bodyJson.brandId,
       name: bodyJson.name,
       generation: bodyJson.generation,
       releaseDate: new Date(bodyJson.releaseDate),

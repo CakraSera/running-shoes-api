@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const ShoeSchema = z.object({
   brandId: z.string().min(3).max(100),
-  brandSlug: z.string().min(3).max(100),
   slug: z.string().min(3).max(100),
   name: z.string().min(3).max(100),
   generation: z.number().int().positive(),
@@ -18,15 +17,25 @@ export const CreateShoeSchema = ShoeSchema.pick({
   name: true,
   slug: true,
   generation: true,
-  releaseDate: true,
   description: true,
   category: true,
   terrain: true,
   bestFor: true,
   imageUrl: true,
+}).extend({
+  releaseDate: z.iso.date(),
 });
 
-export const SeedShoeSchema = CreateShoeSchema.extend({
+export const SeedShoeSchema = ShoeSchema.pick({
+  name: true,
+  releaseDate: true,
+  generation: true,
+  description: true,
+  category: true,
+  terrain: true,
+  bestFor: true,
+  imageUrl: true,
+}).extend({
   brandSlug: z.string().min(3).max(100),
 });
 
@@ -38,7 +47,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "salomon",
     name: "Salomon Speedcross 5",
-    slug: "salomon-speedcross-5",
     generation: 5,
     releaseDate: new Date("2023-01-15"),
     description:
@@ -52,7 +60,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "asics",
     name: "Asics Novablast 5",
-    slug: "asics-novablast-5",
     generation: 5,
     releaseDate: new Date("2024-03-20"),
     description:
@@ -66,7 +73,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "nike",
     name: "Nike Air Max 270",
-    slug: "nike-air-max-270",
     generation: 270,
     releaseDate: new Date("2018-02-01"),
     description:
@@ -80,7 +86,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "adidas",
     name: "Adidas Ultraboost 22",
-    slug: "adidas-ultraboost-22",
     generation: 22,
     releaseDate: new Date("2022-01-15"),
     description:
@@ -94,7 +99,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "puma",
     name: "Puma RS-X³ Puzzle",
-    slug: "puma-rs-x3-puzzle",
     generation: 3,
     releaseDate: new Date("2021-06-10"),
     description:
@@ -108,7 +112,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "reebok",
     name: "Reebok Classic Leather",
-    slug: "reebok-classic-leather",
     generation: 1,
     releaseDate: new Date("1983-01-01"),
     description:
@@ -122,7 +125,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "new-balance",
     name: "New Balance 990v5",
-    slug: "new-balance-990v5",
     generation: 5,
     releaseDate: new Date("2020-09-01"),
     description:
@@ -136,7 +138,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "asics",
     name: "ASICS Gel-Kayano 29",
-    slug: "asics-gel-kayano-29",
     generation: 29,
     releaseDate: new Date("2022-07-15"),
     description:
@@ -150,7 +151,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "brooks",
     name: "Brooks Ghost 15",
-    slug: "brooks-ghost-15",
     generation: 15,
     releaseDate: new Date("2023-08-01"),
     description:
@@ -164,7 +164,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "saucony",
     name: "Saucony Ride 16",
-    slug: "saucony-ride-16",
     generation: 16,
     releaseDate: new Date("2023-03-15"),
     description:
@@ -178,7 +177,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "hoka",
     name: "Hoka Clifton 9",
-    slug: "hoka-clifton-9",
     generation: 9,
     releaseDate: new Date("2023-06-01"),
     description:
@@ -192,7 +190,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "mizuno",
     name: "Mizuno Wave Rider 26",
-    slug: "mizuno-wave-rider-26",
     generation: 26,
     releaseDate: new Date("2023-01-15"),
     description:
@@ -206,7 +203,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "under-armour",
     name: "Under Armour HOVR",
-    slug: "under-armour-hovr",
     generation: 1,
     releaseDate: new Date("2018-02-01"),
     description:
@@ -220,7 +216,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "altra",
     name: "Altra Torin 6",
-    slug: "altra-torin-6",
     generation: 6,
     releaseDate: new Date("2022-09-01"),
     description:
@@ -234,7 +229,6 @@ export const dataShoes: SeedShoe[] = [
   {
     brandSlug: "merrell",
     name: "Merrell Trail Glove 6",
-    slug: "merrell-trail-glove-6",
     generation: 6,
     releaseDate: new Date("2021-03-15"),
     description:

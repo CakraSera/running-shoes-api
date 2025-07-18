@@ -1,18 +1,20 @@
 import { PrismaClient } from "../src/generated/prisma";
 import { dataShoes } from "../data/shoes";
 import { dataBrands } from "../data/brands";
+import { createSlug } from "../lib/slug";
 
 const prisma = new PrismaClient();
 
 async function insertShoes() {
   for (const shoe of dataShoes) {
+    const shoeSlug = createSlug(shoe.name);
     await prisma.shoe.upsert({
       where: {
         name: shoe.name,
       },
       update: {},
       create: {
-        slug: shoe.slug,
+        slug: shoeSlug,
         name: shoe.name,
         generation: shoe.generation,
         releaseDate: new Date(shoe.releaseDate),
@@ -26,6 +28,21 @@ async function insertShoes() {
             slug: shoe.brandSlug,
           },
         },
+      },
+    });
+  }
+}
+
+async function insertBrands() {
+  for (const brand of dataBrands) {
+    await prisma.brand.upsert({
+      where: {
+        name: brand.name,
+      },
+      update: {},
+      create: {
+        ...brand,
+        slug: createSlug(brand.name),
       },
     });
   }
