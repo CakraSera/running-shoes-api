@@ -129,4 +129,23 @@ app.get("/brands/:slug", async (c) => {
   return c.json(brand);
 });
 
+app.get("/brands/:slug/shoes", async (c) => {
+  const slug = c.req.param("slug");
+  console.log("🚀 ~ app.get ~ slug:", slug);
+  const brand = await prisma.brand.findUnique({
+    where: {
+      slug,
+    },
+    include: {
+      shoes: {
+        orderBy: {
+          name: "asc",
+        },
+      },
+    },
+  });
+  console.log("🚀 ~ app.get ~ brand:", brand);
+  return c.json(brand?.shoes || []);
+});
+
 export default app;
