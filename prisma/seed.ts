@@ -25,10 +25,10 @@ async function insertShoes() {
 async function main() {
   await prisma.shoes.deleteMany({});
   await prisma.brand.deleteMany({});
-  // ... you will write your Prisma Client queries here
   console.log("Seeding shoes data...");
   await prisma.brand.createMany({
     data: brands,
+    skipDuplicates: true,
   });
   await insertShoes();
   console.log("Seeding completed successfully!");

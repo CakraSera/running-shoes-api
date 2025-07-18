@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { getAllShoeWithBrand } from "./generated/prisma/sql";
 import { zValidator } from "./validator-wrapper";
 import { ShoeSchema } from "../data/shoes";
 import { PrismaClient } from "./generated/prisma";
@@ -17,15 +18,7 @@ app.get("/", (c) => {
 });
 
 app.get("/shoes", async (c) => {
-  const shoes = await prisma.shoes.findMany({
-    relationLoadStrategy: "join",
-    orderBy: {
-      name: "asc", // Order by shoe name
-    },
-    include: {
-      Brand: true, // Include brand information
-    },
-  });
+  const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());
   return c.json(shoes);
 });
 
