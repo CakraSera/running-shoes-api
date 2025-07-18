@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["relationJoins", "typedSql"]
-  output   = "../src/generated/prisma"
+  output          = "../src/generated/prisma"
 }
 
 datasource db {
@@ -16,32 +16,31 @@ datasource db {
 }
 
 model Brand {
-  id          Int      @id @default(autoincrement())  
+  id          String   @id @default(ulid())
   slug        String   @unique
   name        String   @unique
   description String?
-  website_url String?
-  founded_year Int?
-  logoUrl    String?
+  websiteUrl  String?
+  foundedYear Int?
+  logoUrl     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  shoes      Shoes[]
+  shoes       Shoe[]
 }
 
-model Shoes {
-  id          String      @id @default(cuid())
-  brandId     Int 
-  Brand       Brand       @relation(fields: [brandId], references: [id])
-  name        String      @unique
-  slug        String      @unique
+model Shoe {
+  id          String   @id @default(ulid())
+  brandId     String
+  Brand       Brand    @relation(fields: [brandId], references: [id])
+  name        String   @unique
+  slug        String   @unique
   generation  Int
-  releaseDate  DateTime
+  releaseDate DateTime
   description String?
   category    String?
   terrain     String?
-  bestFor      String?
+  bestFor     String?
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-
