@@ -101,4 +101,32 @@ app.patch("/shoes/:id", zValidator("json", ShoeSchema), async (c) => {
   return c.json(updateShoe);
 });
 
+app.get("/brands", async (c) => {
+  const brands = await prisma.brand.findMany({
+    orderBy: {
+      name: "asc",
+    },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      description: true,
+      website_url: true,
+      founded_year: true,
+      logoUrl: true,
+    },
+  });
+  return c.json(brands);
+});
+
+app.get("/brands/:slug", async (c) => {
+  const slug = c.req.param("slug");
+  const brand = await prisma.brand.findUnique({
+    where: {
+      slug,
+    },
+  });
+  return c.json(brand);
+});
+
 export default app;
