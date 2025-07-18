@@ -14,18 +14,22 @@ const app = new Hono();
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     console.log("HTTPException", err);
-    return err.getResponse();
+    return c.json({ kind: "HTTPException", message: err.message }, err.status);
   }
 
   if (err instanceof Error) {
     console.log("Error", err);
-    return err.toString();
+    return c.json(
+      { kind: "Error", message: err.message, stack: err.stack },
+      500
+    );
   }
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    console.log("PrismaClientKnownRequestError", err);
     return c.json({ error: "Database error occurred" }, 500);
   }
+
+  return c.json({ error: "An unexpected error occurred" }, 500);
 });
 
 app.get("/", (c) => {
@@ -38,13 +42,12 @@ app.get("/", (c) => {
 
 app.get("/shoes", async (c) => {
   const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());
-  console.log("🚀 ~ app.get ~ shoes:", shoes);
   return c.json(shoes);
 });
 
 app.get("/shoes/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const shoe = await prisma.shoes.findUnique({
+  const shoe = await prisma.shoe.findUnique({
     relationLoadStrategy: "join",
     include: {
       Brand: true, // Include brand information
@@ -63,7 +66,7 @@ app.post("/shoes", zValidator("json", ShoeSchema), async (c) => {
   try {
     const newShoeData = c.req.valid("json");
     const shoeSlug = slugify(newShoeData.name);
-    const createdShoe = await prisma.shoes.create({
+    const createdShoe = await prisma.shoe.create({
       data: {
         slug: shoeSlug,
         brandId: newShoeData.brandId,
@@ -85,13 +88,13 @@ app.post("/shoes", zValidator("json", ShoeSchema), async (c) => {
 });
 
 app.delete("/shoes", async (c) => {
-  const deleteShoes = await prisma.shoes.deleteMany({});
+  const deleteShoes = await prisma.shoe.deleteMany({});
   return c.json(deleteShoes);
 });
 
 app.delete("/shoes/:id", async (c) => {
   const id = c.req.param("id");
-  const deleteShoes = await prisma.shoes.delete({
+  const deleteShoes = await prisma.shoe.delete({
     where: {
       id,
     },
@@ -102,7 +105,7 @@ app.delete("/shoes/:id", async (c) => {
 app.patch("/shoes/:id", zValidator("json", ShoeSchema), async (c) => {
   const id = c.req.param("id") as string;
   const bodyJson = c.req.valid("json");
-  const updateShoe = await prisma.shoes.update({
+  const updateShoe = await prisma.shoe.update({
     where: { id },
     data: {
       brandId: bodyJson.brandId,
@@ -129,8 +132,8 @@ app.get("/brands", async (c) => {
       slug: true,
       name: true,
       description: true,
-      website_url: true,
-      founded_year: true,
+      websiteUrl: true,
+      foundedYear: true,
       logoUrl: true,
     },
   });
@@ -149,7 +152,6 @@ app.get("/brands/:slug", async (c) => {
 
 app.get("/brands/:slug/shoes", async (c) => {
   const slug = c.req.param("slug");
-  console.log("🚀 ~ app.get ~ slug:", slug);
   const brand = await prisma.brand.findUnique({
     where: {
       slug,
@@ -162,7 +164,6 @@ app.get("/brands/:slug/shoes", async (c) => {
       },
     },
   });
-  console.log("🚀 ~ app.get ~ brand:", brand);
   return c.json(brand?.shoes || []);
 });
 
