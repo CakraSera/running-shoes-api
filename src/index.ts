@@ -4,37 +4,36 @@ import slugify from "slugify";
 import * as Sentry from "@sentry/bun";
 
 import { getAllShoeWithBrand } from "./generated/prisma/sql";
+import z from "zod";
 import { zValidator } from "./validator-wrapper";
-import { CreateShoeSchema, ShoeSchema } from "../data/shoes";
+import { CreateShoeSchema } from "../data/shoes";
 import { PrismaClient, Prisma } from "./generated/prisma";
+import { ZodError } from "zod";
 
 Sentry.init({
-  dsn: "https://2afa3a7f92d595d7c8ea32be448d2ed3@o4509690478329856.ingest.us.sentry.io/4509690482851840",
+  dsn: process.env.SENTRY_DSN,
 });
 
-const prisma = new PrismaClient({
-  log: ["query"],
-});
+const prisma = new PrismaClient({});
 
 const app = new Hono();
 
-app.onError((err, c) => {
-  if (err instanceof HTTPException) {
-    console.log("HTTPException", err);
-    return c.json({ kind: "HTTPException", message: err.message }, err.status);
+app.onError((error, c) => {
+  if (error instanceof HTTPException) {
+    return c.json({ kind: "hono", error: error }, 400);
   }
 
-  if (err instanceof Error) {
-    console.log("Error", err);
-    return c.json(
-      { kind: "Error", message: err.message, stack: err.stack },
-      500
-    );
+  if (error instanceof ZodError) {
+    const pretty = z.prettifyError(error);
+    return c.json({ kind: "zod", error: pretty }, 400);
   }
 
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    return c.json({ error: "Database error occurred" }, 500);
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    console.error("Prisma error:", error);
+    return c.json({ kind: "prisma", error: error }, 400);
   }
+
+  Sentry.captureException(error);
 
   return c.json({ error: "An unexpected error occurred" }, 500);
 });
@@ -74,29 +73,24 @@ app.get("/shoes/:slug", async (c) => {
   return c.json(shoe);
 });
 
-app.post("/shoes", zValidator("json", ShoeSchema), async (c) => {
-  try {
-    const newShoeData = c.req.valid("json");
-    const shoeSlug = slugify(newShoeData.name);
-    const createdShoe = await prisma.shoe.create({
-      data: {
-        slug: shoeSlug,
-        brandId: newShoeData.brandId,
-        name: newShoeData.name,
-        generation: newShoeData.generation,
-        releaseDate: new Date(newShoeData.releaseDate),
-        description: newShoeData.description,
-        category: newShoeData.category,
-        terrain: newShoeData.terrain,
-        bestFor: newShoeData.bestFor,
-        imageUrl: newShoeData.imageUrl,
-      },
-    });
-    return c.json(createdShoe, 201);
-  } catch (error) {
-    console.error("Error creating shoe:", error);
-    return c.json({ error: "Internal Server Error" }, 500);
-  }
+app.post("/shoes", zValidator("json", CreateShoeSchema), async (c) => {
+  const newShoeData = c.req.valid("json");
+  const shoeSlug = slugify(newShoeData.name);
+  const createdShoe = await prisma.shoe.create({
+    data: {
+      slug: shoeSlug,
+      brandId: newShoeData.brandId,
+      name: newShoeData.name,
+      generation: newShoeData.generation,
+      releaseDate: new Date(newShoeData.releaseDate),
+      description: newShoeData.description,
+      category: newShoeData.category,
+      terrain: newShoeData.terrain,
+      bestFor: newShoeData.bestFor,
+      imageUrl: newShoeData.imageUrl,
+    },
+  });
+  return c.json(createdShoe, 201);
 });
 
 app.delete("/shoes", async (c) => {

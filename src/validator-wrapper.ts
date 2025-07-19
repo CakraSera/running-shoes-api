@@ -1,7 +1,6 @@
 // file: validator-wrapper.ts
-import { ZodSchema } from "zod";
+import z, { ZodSchema } from "zod";
 import type { ValidationTargets } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { zValidator as zv } from "@hono/zod-validator";
 
 export const zValidator = <
@@ -12,8 +11,8 @@ export const zValidator = <
   schema: T
 ) =>
   zv(target, schema, (result, c) => {
-    console.log("🚀 ~ zv ~ result:", result);
     if (!result.success) {
-      throw new HTTPException(400, { cause: result.error });
+      const pretty = z.prettifyError(result.error);
+      return c.text(pretty, 400);
     }
   });

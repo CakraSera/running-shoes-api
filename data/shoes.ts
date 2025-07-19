@@ -14,8 +14,8 @@ export const ShoeSchema = z.object({
 });
 
 export const CreateShoeSchema = ShoeSchema.pick({
+  brandId: true,
   name: true,
-  slug: true,
   generation: true,
   description: true,
   category: true,
@@ -24,6 +24,19 @@ export const CreateShoeSchema = ShoeSchema.pick({
   imageUrl: true,
 }).extend({
   releaseDate: z.iso.date(),
+});
+
+export const UpdateShoeSchema = ShoeSchema.pick({
+  name: true,
+  generation: true,
+  releaseDate: true,
+  description: true,
+  category: true,
+  terrain: true,
+  bestFor: true,
+  imageUrl: true,
+}).extend({
+  brandId: z.string().min(3).max(100),
 });
 
 export const SeedShoeSchema = ShoeSchema.pick({
@@ -40,7 +53,6 @@ export const SeedShoeSchema = ShoeSchema.pick({
 });
 
 export type Shoe = z.infer<typeof ShoeSchema>;
-export type CreateShoe = z.infer<typeof CreateShoeSchema>;
 export type SeedShoe = z.infer<typeof SeedShoeSchema>;
 
 export const dataShoes: SeedShoe[] = [
