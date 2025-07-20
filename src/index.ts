@@ -1,10 +1,9 @@
-import { Hono } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/bun";
-import z from "zod";
+import z, { ZodError } from "zod";
 import { Prisma } from "./generated/prisma";
-import { ZodError } from "zod";
 
 // Route imports
 import Shoe from "./routes/shoe-route";
@@ -14,7 +13,7 @@ Sentry.init({
   dsn: process.env.SENTRY_DSN,
 });
 
-const app = new Hono();
+const app = new OpenAPIHono();
 
 app.use(logger());
 
@@ -47,5 +46,14 @@ app.onError((error, c) => {
 
 app.route("/shoes", Shoe);
 app.route("/brands", Brand);
+
+// The OpenAPI documentation will be available at /doc
+app.doc("/doc", {
+  openapi: "3.0.0",
+  info: {
+    version: "1.0.0",
+    title: "Running Shoes API",
+  },
+});
 
 export default app;
