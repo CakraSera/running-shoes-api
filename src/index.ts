@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/bun";
 import z from "zod";
@@ -15,8 +16,15 @@ Sentry.init({
 
 const app = new Hono();
 
-app.route("/shoes", Shoe);
-app.route("/brands", Brand);
+app.use(logger());
+
+app.get("/", (c) => {
+  return c.json({
+    ok: true,
+    message: "Welcome to the Running Shoes API",
+    runningShoes: "/shoes",
+  });
+});
 
 app.onError((error, c) => {
   if (error instanceof HTTPException) {
@@ -37,12 +45,7 @@ app.onError((error, c) => {
   return c.json({ error: "An unexpected error occurred" }, 500);
 });
 
-app.get("/", (c) => {
-  return c.json({
-    ok: true,
-    message: "Welcome to the Running Shoes API",
-    runningShoes: "/shoes",
-  });
-});
+app.route("/shoes", Shoe);
+app.route("/brands", Brand);
 
 export default app;
