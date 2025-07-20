@@ -1,20 +1,19 @@
 import { PrismaClient } from "../src/generated/prisma";
 import { dataShoes } from "../data/shoes";
 import { dataBrands } from "../data/brands";
-import { createSlug } from "../lib/slug";
+import { createSlug } from "../src/lib/slug";
 
 const prisma = new PrismaClient();
 
 async function insertShoes() {
   for (const shoe of dataShoes) {
-    const shoeSlug = createSlug(shoe.name);
     await prisma.shoe.upsert({
       where: {
         name: shoe.name,
       },
       update: {},
       create: {
-        slug: shoeSlug,
+        slug: createSlug(shoe.name),
         name: shoe.name,
         generation: shoe.generation,
         releaseDate: new Date(shoe.releaseDate),
@@ -52,10 +51,7 @@ async function main() {
   console.log("Starting seeding process...");
   await prisma.shoe.deleteMany({});
   await prisma.brand.deleteMany({});
-  await prisma.brand.createMany({
-    data: dataBrands,
-    skipDuplicates: true,
-  });
+  await insertBrands();
   await insertShoes();
   console.log("Seeding completed successfully!");
 }
