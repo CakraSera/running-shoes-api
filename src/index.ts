@@ -18,13 +18,44 @@ const app = new OpenAPIHono();
 
 app.use(logger());
 
-app.get("/", (c) => {
-  return c.json({
-    ok: true,
-    message: "Welcome to the Running Shoes API",
-    runningShoes: "/shoes",
+const WelcomeResponseSchema = z
+  .object({
+    ok: z.boolean(),
+    message: z.string(),
+    runningShoes: z.string(),
+  })
+  .openapi({
+    type: "object",
+    example: {
+      ok: true,
+      message: "Welcome to the Running Shoes API",
+      runningShoes: "/shoes",
+    },
   });
-});
+
+app.openapi(
+  {
+    method: "get",
+    path: "/",
+    responses: {
+      200: {
+        description: "Welcome message",
+        content: {
+          "application/json": {
+            schema: WelcomeResponseSchema,
+          },
+        },
+      },
+    },
+  },
+  (c) => {
+    return c.json({
+      ok: true,
+      message: "Welcome to the Running Shoes API",
+      runningShoes: "/shoes",
+    });
+  }
+);
 
 app.onError((error, c) => {
   if (error instanceof HTTPException) {
