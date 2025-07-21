@@ -4,8 +4,27 @@ import { CreateShoeSchema } from "../../data/shoes";
 import { prisma } from "../lib/prisma";
 import { getAllShoeWithBrand } from "../generated/prisma/sql";
 import { createSlug } from "../lib/slug";
+import { appWithOpenApi } from "../lib/open-api";
 
 const app = new Hono();
+
+// appWithOpenApi.openapi(
+//   {
+//     method: "get",
+//     path: "/",
+//     description: "Get all running shoes with brand information",
+//     responses: {
+//       200: {
+//         description: "Successfully retrieved all running shoes",
+//       },
+//     },
+//     apiTags: ["Shoe"],
+//   },
+//   async (c) => {
+//     const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());
+//     return c.json(shoes);
+//   }
+// );
 
 app.get("/", async (c) => {
   const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());

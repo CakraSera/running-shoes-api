@@ -4,6 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/bun";
 import z, { ZodError } from "zod";
 import { Prisma } from "./generated/prisma";
+import { Scalar } from "@scalar/hono-api-reference";
 
 // Route imports
 import Shoe from "./routes/shoe-route";
@@ -48,12 +49,22 @@ app.route("/shoes", Shoe);
 app.route("/brands", Brand);
 
 // The OpenAPI documentation will be available at /doc
-app.doc("/doc", {
+const description =
+  "Running Shoes API - A RESTful API for managing running shoes and brands.";
+
+app.doc("/docs", {
   openapi: "3.0.0",
   info: {
     version: "1.0.0",
     title: "Running Shoes API",
+    description: description,
   },
 });
+
+// Use the middleware to serve the Scalar API Reference at /scalar
+app.get(
+  "/scalar",
+  Scalar({ url: "/docs", theme: "keplerkepler", layout: "classic" })
+);
 
 export default app;
