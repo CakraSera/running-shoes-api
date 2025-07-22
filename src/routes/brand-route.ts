@@ -1,25 +1,45 @@
-import { Hono } from "hono";
+import z from "zod";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { prisma } from "../lib/prisma";
+import { BrandListSchema } from "../../data/brands";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 
-app.get("/", async (c) => {
-  const brands = await prisma.brand.findMany({
-    orderBy: {
-      name: "asc",
+app.openapi(
+  {
+    method: "get",
+    path: "/",
+    responses: {
+      200: {
+        description: "List of brands",
+        content: {
+          "application/json": {
+            schema: BrandListSchema,
+          },
+        },
+      },
     },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      description: true,
-      websiteUrl: true,
-      foundedYear: true,
-      logoUrl: true,
-    },
-  });
-  return c.json(brands);
-});
+    tags: ["Brands"],
+  },
+  async (c) => {
+    const brands = await prisma.brand.findMany({
+      orderBy: {
+        name: "asc",
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        websiteUrl: true,
+        foundedYear: true,
+        logoUrl: true,
+      },
+    });
+    if (!brands) return c.json(404);
+    return c.json(brands);
+  }
+);
 
 app.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
