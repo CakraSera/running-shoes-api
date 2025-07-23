@@ -95,7 +95,7 @@ app.doc("/docs", {
 // Use the middleware to serve the Scalar API Reference at /scalar
 app.get(
   "/scalar",
-  Scalar({ url: "/docs", theme: "keplerkepler", layout: "classic" })
+  Scalar({ url: "/docs", theme: "kepler ", layout: "classic" })
 );
 
 export default app;

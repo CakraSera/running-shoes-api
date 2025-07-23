@@ -1,56 +1,5 @@
-import { z } from "zod";
-
-export const ShoeSchema = z.object({
-  brandId: z.string().min(3).max(100),
-  slug: z.string().min(3).max(100),
-  name: z.string().min(3).max(100),
-  generation: z.number().int().positive(),
-  releaseDate: z.date(),
-  description: z.string().min(3).max(500).optional(),
-  category: z.string().min(3).max(100).optional(),
-  terrain: z.string().min(3).max(100).optional(),
-  bestFor: z.string().min(3).max(100).optional(),
-  imageUrl: z.string().url().optional(),
-});
-
-export const CreateShoeSchema = ShoeSchema.pick({
-  brandId: true,
-  name: true,
-  generation: true,
-  description: true,
-  category: true,
-  terrain: true,
-  bestFor: true,
-  imageUrl: true,
-}).extend({
-  releaseDate: z.iso.date(),
-});
-
-export const UpdateShoeSchema = ShoeSchema.pick({
-  name: true,
-  generation: true,
-  releaseDate: true,
-  description: true,
-  category: true,
-  terrain: true,
-  bestFor: true,
-  imageUrl: true,
-}).extend({
-  brandId: z.string().min(3).max(100),
-});
-
-export const SeedShoeSchema = ShoeSchema.pick({
-  name: true,
-  releaseDate: true,
-  generation: true,
-  description: true,
-  category: true,
-  terrain: true,
-  bestFor: true,
-  imageUrl: true,
-}).extend({
-  brandSlug: z.string().min(3).max(100),
-});
+import { z } from "@hono/zod-openapi";
+import { ShoeSchema, SeedShoeSchema } from "../schemas/shoe-schema";
 
 export type Shoe = z.infer<typeof ShoeSchema>;
 export type SeedShoe = z.infer<typeof SeedShoeSchema>;
