@@ -1,7 +1,8 @@
 import z from "zod";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { prisma } from "../lib/prisma";
-import { BrandListSchema } from "../../data/brands";
+import { BrandSchema, SlugBrandSchema } from "../schemas/brand-schema";
+import { createRoute } from "@hono/zod-openapi";
 
 const app = new OpenAPIHono();
 
@@ -12,11 +13,6 @@ app.openapi(
     responses: {
       200: {
         description: "List of brands",
-        content: {
-          "application/json": {
-            schema: BrandListSchema,
-          },
-        },
       },
     },
     tags: ["Brands"],
@@ -41,14 +37,42 @@ app.openapi(
   }
 );
 
-app.get("/:slug", async (c) => {
-  const slug = c.req.param("slug");
+const getBrandBySlug = createRoute({
+  method: "get",
+  path: "/{slug}",
+  description: "Get a brand by slug",
+  request: {
+    params: SlugBrandSchema,
+  },
+  responses: {
+    200: {
+      description: "Get a brand by slug",
+    },
+    400: {
+      description: "Invalid slug format",
+    },
+  },
+  tags: ["Brands"],
+});
+
+app.openapi(getBrandBySlug, async (c) => {
+  const { slug } = c.req.valid("param");
   const brand = await prisma.brand.findUnique({
     where: {
       slug,
     },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      description: true,
+      websiteUrl: true,
+      foundedYear: true,
+      logoUrl: true,
+    },
   });
-  return c.json(brand);
+  if (!brand) return c.json(404);
+  return c.json(brand, 200);
 });
 
 app.get("/:slug/shoes", async (c) => {

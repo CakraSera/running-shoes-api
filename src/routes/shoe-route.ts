@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "../validator-wrapper";
-import { CreateShoeSchema } from "../../data/shoes";
+import { CreateShoeSchema } from "../data/shoes";
 import { prisma } from "../lib/prisma";
 import { getAllShoeWithBrand } from "../generated/prisma/sql";
 import { createSlug } from "../lib/slug";
