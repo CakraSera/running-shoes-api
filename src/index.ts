@@ -30,6 +30,7 @@ const WelcomeResponseSchema = z
       ok: true,
       message: "Welcome to the Running Shoes API",
       runningShoes: "/shoes",
+      OpenApi: "/scalar",
     },
   });
 
