@@ -3,8 +3,9 @@ import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/bun";
 import z, { ZodError } from "zod";
-import { Prisma } from "./generated/prisma";
 import { Scalar } from "@scalar/hono-api-reference";
+import { prettyJSON } from "hono/pretty-json";
+import { Prisma } from "./generated/prisma";
 
 // Route imports
 import Shoe from "./routes/shoe-route";
@@ -91,6 +92,7 @@ app.doc("/docs", {
   },
 });
 
+app.use("/doc/*", prettyJSON());
 // Use the middleware to serve the Scalar API Reference at /scalar
 app.get(
   "/scalar",

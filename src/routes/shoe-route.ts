@@ -123,19 +123,20 @@ app.openapi(
 app.openapi(
   {
     method: "delete",
-    path: "/{id}",
-    description: "Delete a shoe by ID",
+    path: "/",
+    description: "Delete all shoes",
     request: {
       params: ParamsByIdShoeSchema,
     },
     responses: {
       200: {
-        description: "Shoe deleted successfully",
+        description: "Successfully deleted all shoes",
       },
       404: {
-        description: "Shoe not found",
+        description: "Failed to delete shoes",
       },
     },
+    tags: [TAGS],
   },
   async (c) => {
     const deleteShoes = await prisma.shoe.deleteMany({});
@@ -159,6 +160,7 @@ app.openapi(
         description: "Shoe not found",
       },
     },
+    tags: [TAGS],
   },
   async (c) => {
     const id = c.req.param("id");
@@ -171,23 +173,54 @@ app.openapi(
   }
 );
 
-app.patch("/:id", zValidator("json", CreateShoeSchema), async (c) => {
-  const id = c.req.param("id") as string;
-  const bodyJson = c.req.valid("json");
-  const updateShoe = await prisma.shoe.update({
-    where: { id },
-    data: {
-      name: bodyJson.name,
-      generation: bodyJson.generation,
-      releaseDate: new Date(bodyJson.releaseDate),
-      description: bodyJson.description,
-      category: bodyJson.category,
-      terrain: bodyJson.terrain,
-      bestFor: bodyJson.bestFor,
-      imageUrl: bodyJson.imageUrl,
+app.openapi(
+  {
+    path: "/{id}",
+    method: "patch",
+    description: "Update a shoe by ID",
+    request: {
+      params: ParamsByIdShoeSchema,
+      body: {
+        content: {
+          "application/json": {
+            schema: CreateShoeSchema,
+          },
+        },
+      },
     },
-  });
-  return c.json(updateShoe);
-});
+    responses: {
+      200: {
+        description: "Shoe updated successfully",
+        content: {
+          "application/json": {
+            schema: CreateShoeSchema,
+          },
+        },
+      },
+      404: {
+        description: "Shoe not found",
+      },
+    },
+    tags: [TAGS],
+  },
+  async (c) => {
+    const id = c.req.param("id") as string;
+    const bodyJson = c.req.valid("json");
+    const updateShoe = await prisma.shoe.update({
+      where: { id },
+      data: {
+        name: bodyJson.name,
+        generation: bodyJson.generation,
+        releaseDate: new Date(bodyJson.releaseDate),
+        description: bodyJson.description,
+        category: bodyJson.category,
+        terrain: bodyJson.terrain,
+        bestFor: bodyJson.bestFor,
+        imageUrl: bodyJson.imageUrl,
+      },
+    });
+    return c.json(updateShoe);
+  }
+);
 
 export default app;

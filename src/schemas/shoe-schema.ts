@@ -2,16 +2,16 @@ import { z } from "@hono/zod-openapi";
 
 export const ShoeSchema = z.object({
   id: z.string().openapi({
-    example: "d3b6f8d2-4c5e-4a1b-9c2e-7f8b9f0a1b2c",
+    example: "01K0YEKQF33PHHYPVX8KNH781V",
   }),
   brandId: z.string().min(3).max(100).openapi({
-    example: "salomon",
+    example: "01K0F3N8B6VV3VHT949BRMN7KA",
   }),
   slug: z.string().min(3).max(100).openapi({
-    example: "salomon-speedcross-5",
+    example: "salomon-speedcross-10",
   }),
   name: z.string().min(3).max(100).openapi({
-    example: "Salomon Speedcross 5",
+    example: "Salomon Speedcross 10",
   }),
   generation: z.number().int().positive().openapi({
     example: 5,
