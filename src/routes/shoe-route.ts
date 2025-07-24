@@ -1,54 +1,117 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { Hono } from "hono";
 import { zValidator } from "../validator-wrapper";
-import { CreateShoeSchema } from "../schemas/shoe-schema";
+import { CreateShoeSchema, SlugShoeSchema } from "../schemas/shoe-schema";
 import { prisma } from "../lib/prisma";
 import { getAllShoeWithBrand } from "../generated/prisma/sql";
 import { createSlug } from "../lib/slug";
-import { appWithOpenApi } from "../lib/open-api";
 
-const app = new Hono();
+const TAGS = "Shoes";
 
-app.get("/", async (c) => {
-  const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());
-  return c.json(shoes);
-});
+const app = new OpenAPIHono({});
 
-app.get("/:slug", async (c) => {
-  const slug = c.req.param("slug");
-  const shoe = await prisma.shoe.findUnique({
-    relationLoadStrategy: "join",
-    include: {
-      Brand: true, // Include brand information
+app.openapi(
+  {
+    method: "get",
+    path: "/",
+    responses: {
+      200: {
+        description: "List of shoes",
+      },
     },
-    where: {
-      slug,
-    },
-  });
-  if (!shoe) {
-    return c.json(404);
+    tags: [TAGS],
+  },
+  async (c) => {
+    const shoes = await prisma.$queryRawTyped(getAllShoeWithBrand());
+    return c.json(shoes);
   }
-  return c.json(shoe);
-});
+);
 
-app.post("/", zValidator("json", CreateShoeSchema), async (c) => {
-  const newShoeData = c.req.valid("json");
-  const shoeSlug = createSlug(newShoeData.name);
-  const createdShoe = await prisma.shoe.create({
-    data: {
-      slug: shoeSlug,
-      brandId: newShoeData.brandId,
-      name: newShoeData.name,
-      generation: newShoeData.generation,
-      releaseDate: new Date(newShoeData.releaseDate),
-      description: newShoeData.description,
-      category: newShoeData.category,
-      terrain: newShoeData.terrain,
-      bestFor: newShoeData.bestFor,
-      imageUrl: newShoeData.imageUrl,
+app.openapi(
+  {
+    method: "get",
+    path: "/{slug}",
+    description: "Get shoes",
+    request: {
+      params: SlugShoeSchema,
     },
-  });
-  return c.json(createdShoe, 201);
-});
+    responses: {
+      200: {
+        description: "Success get a shoe by slug",
+      },
+      400: {
+        description: "Invalid slug format",
+      },
+    },
+    tags: [TAGS],
+  },
+  async (c) => {
+    const slug = c.req.param("slug");
+    const shoe = await prisma.shoe.findUnique({
+      relationLoadStrategy: "join",
+      include: {
+        Brand: true, // Include brand information
+      },
+      where: {
+        slug,
+      },
+    });
+    if (!shoe) {
+      return c.json(404);
+    }
+    return c.json(shoe);
+  }
+);
+
+app.openapi(
+  {
+    path: "/",
+    method: "post",
+    description: "Create a new shoe",
+    request: {
+      body: {
+        content: {
+          "application/json": {
+            schema: CreateShoeSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: "Shoe created successfully",
+        content: {
+          "application/json": {
+            schema: CreateShoeSchema,
+          },
+        },
+      },
+      400: {
+        description: "Invalid request body",
+      },
+    },
+  },
+  zValidator("json", CreateShoeSchema),
+  async (c) => {
+    const newShoeData = c.req.valid("json");
+    const shoeSlug = createSlug(newShoeData.name);
+    const createdShoe = await prisma.shoe.create({
+      data: {
+        slug: shoeSlug,
+        brandId: newShoeData.brandId,
+        name: newShoeData.name,
+        generation: newShoeData.generation,
+        releaseDate: new Date(newShoeData.releaseDate),
+        description: newShoeData.description,
+        category: newShoeData.category,
+        terrain: newShoeData.terrain,
+        bestFor: newShoeData.bestFor,
+        imageUrl: newShoeData.imageUrl,
+      },
+    });
+    return c.json(createdShoe, 201);
+  }
+);
 
 app.delete("/", async (c) => {
   const deleteShoes = await prisma.shoe.deleteMany({});

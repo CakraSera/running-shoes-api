@@ -45,7 +45,7 @@ app.openapi(
     },
     responses: {
       200: {
-        description: "Get a brand by slug",
+        description: "Success Get a brand by slug",
         content: {
           "application/json": {
             schema: BrandSchema,

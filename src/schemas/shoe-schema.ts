@@ -34,6 +34,10 @@ export const ShoeSchema = z.object({
   }),
 });
 
+export const SlugShoeSchema = ShoeSchema.pick({
+  slug: true,
+});
+
 export const ListArrayShoesSchema = z.array(ShoeSchema);
 
 export const CreateShoeSchema = ShoeSchema.pick({
