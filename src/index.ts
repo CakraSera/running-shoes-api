@@ -25,7 +25,6 @@ const WelcomeResponseSchema = z
     runningShoes: z.string(),
   })
   .openapi({
-    type: "object",
     example: {
       ok: true,
       message: "Welcome to the Running Shoes API",
