@@ -23,6 +23,8 @@ Welcome to the Running Shoes API! This project was born out of a passion for run
 | GET    | /brands/{slug}       | Get brand by slug       |
 | GET    | /brands/{slug}/shoes | Get shoes by brand slug |
 
+For more detail: [https://running-shoes.cakrasera.com/scalar](https://running-shoes.cakrasera.com/scalar)
+
 Every great API starts with a solid foundation. The database schema for this project is thoughtfully designed to capture the essential details about shoes and brands. Curious about the structure? Check out the schema diagram here: [View Database Design](https://dbdiagram.io/d/Running-Shoes-68634226f413ba35089eb281)
 
 ## Getting Started: Your First Steps
