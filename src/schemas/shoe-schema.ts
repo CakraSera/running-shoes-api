@@ -1,6 +1,9 @@
 import { z } from "@hono/zod-openapi";
 
 export const ShoeSchema = z.object({
+  id: z.string().openapi({
+    example: "d3b6f8d2-4c5e-4a1b-9c2e-7f8b9f0a1b2c",
+  }),
   brandId: z.string().min(3).max(100).openapi({
     example: "salomon",
   }),
@@ -50,7 +53,9 @@ export const CreateShoeSchema = ShoeSchema.pick({
   bestFor: true,
   imageUrl: true,
 }).extend({
-  releaseDate: z.iso.date(),
+  releaseDate: z.iso.date().openapi({
+    example: "2023-01-04",
+  }),
 });
 
 export const UpdateShoeSchema = ShoeSchema.pick({
@@ -77,4 +82,8 @@ export const SeedShoeSchema = ShoeSchema.pick({
   imageUrl: true,
 }).extend({
   brandSlug: z.string().min(3).max(100),
+});
+
+export const ParamsByIdShoeSchema = ShoeSchema.pick({
+  id: true,
 });

@@ -1,7 +1,11 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Hono } from "hono";
 import { zValidator } from "../validator-wrapper";
-import { CreateShoeSchema, SlugShoeSchema } from "../schemas/shoe-schema";
+import {
+  CreateShoeSchema,
+  ParamsByIdShoeSchema,
+  SlugShoeSchema,
+} from "../schemas/shoe-schema";
 import { prisma } from "../lib/prisma";
 import { getAllShoeWithBrand } from "../generated/prisma/sql";
 import { createSlug } from "../lib/slug";
@@ -90,8 +94,8 @@ app.openapi(
         description: "Invalid request body",
       },
     },
+    tags: [TAGS],
   },
-  zValidator("json", CreateShoeSchema),
   async (c) => {
     const newShoeData = c.req.valid("json");
     const shoeSlug = createSlug(newShoeData.name);
@@ -109,24 +113,63 @@ app.openapi(
         imageUrl: newShoeData.imageUrl,
       },
     });
+    if (!createdShoe) {
+      return c.json({ error: "Failed to create shoe" }, 400);
+    }
     return c.json(createdShoe, 201);
   }
 );
 
-app.delete("/", async (c) => {
-  const deleteShoes = await prisma.shoe.deleteMany({});
-  return c.json(deleteShoes);
-});
-
-app.delete("/:id", async (c) => {
-  const id = c.req.param("id");
-  const deleteShoes = await prisma.shoe.delete({
-    where: {
-      id,
+app.openapi(
+  {
+    method: "delete",
+    path: "/{id}",
+    description: "Delete a shoe by ID",
+    request: {
+      params: ParamsByIdShoeSchema,
     },
-  });
-  return c.json(deleteShoes);
-});
+    responses: {
+      200: {
+        description: "Shoe deleted successfully",
+      },
+      404: {
+        description: "Shoe not found",
+      },
+    },
+  },
+  async (c) => {
+    const deleteShoes = await prisma.shoe.deleteMany({});
+    return c.json(deleteShoes);
+  }
+);
+
+app.openapi(
+  {
+    path: "/{id}",
+    method: "delete",
+    description: "Delete a shoe by ID",
+    request: {
+      params: ParamsByIdShoeSchema,
+    },
+    responses: {
+      200: {
+        description: "Shoe deleted successfully",
+      },
+      404: {
+        description: "Shoe not found",
+      },
+    },
+  },
+  async (c) => {
+    const id = c.req.param("id");
+    const deleteShoes = await prisma.shoe.delete({
+      where: {
+        id,
+      },
+    });
+    return c.json(deleteShoes);
+  }
+);
 
 app.patch("/:id", zValidator("json", CreateShoeSchema), async (c) => {
   const id = c.req.param("id") as string;
