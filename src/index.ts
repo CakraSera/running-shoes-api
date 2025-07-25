@@ -5,11 +5,12 @@ import * as Sentry from "@sentry/bun";
 import z, { ZodError } from "zod";
 import { Scalar } from "@scalar/hono-api-reference";
 import { prettyJSON } from "hono/pretty-json";
-import { Prisma } from "./generated/prisma";
 
+import { Prisma } from "./generated/prisma";
 // Route imports
-import Shoe from "./routes/shoe-route";
-import Brand from "./routes/brand-route";
+import { shoeRoute } from "./routes/shoe-route";
+import { brandRoute } from "./routes/brand-route";
+import { indexRoute } from "./routes/index-route";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -18,47 +19,6 @@ Sentry.init({
 const app = new OpenAPIHono();
 
 app.use(logger());
-
-const WelcomeResponseSchema = z
-  .object({
-    ok: z.boolean(),
-    message: z.string(),
-    runningShoes: z.string(),
-  })
-  .openapi({
-    example: {
-      ok: true,
-      message: "Welcome to the Running Shoes API",
-      runningShoes: "/shoes",
-      OpenApi: "/scalar",
-    },
-  });
-
-app.openapi(
-  {
-    method: "get",
-    path: "/",
-    responses: {
-      200: {
-        description: "Welcome message",
-        content: {
-          "application/json": {
-            schema: WelcomeResponseSchema,
-          },
-        },
-      },
-    },
-    tags: ["Index"],
-  },
-  (c) => {
-    return c.json({
-      ok: true,
-      message: "Welcome to the Running Shoes API",
-      runningShoes: "/shoes",
-      scalar: "/scalar",
-    });
-  }
-);
 
 app.onError((error, c) => {
   if (error instanceof HTTPException) {
@@ -79,8 +39,9 @@ app.onError((error, c) => {
   return c.json({ error: "An unexpected error occurred" }, 500);
 });
 
-app.route("/shoes", Shoe);
-app.route("/brands", Brand);
+app.route("/", indexRoute);
+app.route("/shoes", shoeRoute);
+app.route("/brands", brandRoute);
 
 // The OpenAPI documentation will be available at /doc
 const description =

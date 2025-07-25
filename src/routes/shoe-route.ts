@@ -1,10 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { Hono } from "hono";
-import { zValidator } from "../validator-wrapper";
 import {
   CreateShoeSchema,
   ParamsByIdShoeSchema,
+  ShoeSchema,
   SlugShoeSchema,
+  UpdateShoeSchema,
 } from "../schemas/shoe-schema";
 import { prisma } from "../lib/prisma";
 import { getAllShoeWithBrand } from "../generated/prisma/sql";
@@ -12,16 +12,14 @@ import { createSlug } from "../lib/slug";
 
 const TAGS = "Shoes";
 
-const app = new OpenAPIHono({});
+export const shoeRoute = new OpenAPIHono({});
 
-app.openapi(
+shoeRoute.openapi(
   {
     method: "get",
     path: "/",
     responses: {
-      200: {
-        description: "List of shoes",
-      },
+      200: { description: "List of shoes" },
     },
     tags: [TAGS],
   },
@@ -31,7 +29,7 @@ app.openapi(
   }
 );
 
-app.openapi(
+shoeRoute.openapi(
   {
     method: "get",
     path: "/{slug}",
@@ -40,12 +38,8 @@ app.openapi(
       params: SlugShoeSchema,
     },
     responses: {
-      200: {
-        description: "Success get a shoe by slug",
-      },
-      400: {
-        description: "Invalid slug format",
-      },
+      200: { description: "Success get a shoe by slug" },
+      400: { description: "Invalid slug format" },
     },
     tags: [TAGS],
   },
@@ -54,7 +48,7 @@ app.openapi(
     const shoe = await prisma.shoe.findUnique({
       relationLoadStrategy: "join",
       include: {
-        Brand: true, // Include brand information
+        brand: true, // Include brand information
       },
       where: {
         slug,
@@ -67,50 +61,32 @@ app.openapi(
   }
 );
 
-app.openapi(
+shoeRoute.openapi(
   {
     path: "/",
     method: "post",
     description: "Create a new shoe",
     request: {
       body: {
-        content: {
-          "application/json": {
-            schema: CreateShoeSchema,
-          },
-        },
+        content: { "shoeRoutelication/json": { schema: CreateShoeSchema } },
       },
     },
     responses: {
       201: {
         description: "Shoe created successfully",
-        content: {
-          "application/json": {
-            schema: CreateShoeSchema,
-          },
-        },
+        content: { "shoeRoutelication/json": { schema: CreateShoeSchema } },
       },
-      400: {
-        description: "Invalid request body",
-      },
+      400: { description: "Invalid request body" },
     },
     tags: [TAGS],
   },
   async (c) => {
-    const newShoeData = c.req.valid("json");
-    const shoeSlug = createSlug(newShoeData.name);
+    const newShoeData = await c.req.json();
     const createdShoe = await prisma.shoe.create({
       data: {
-        slug: shoeSlug,
-        brandId: newShoeData.brandId,
-        name: newShoeData.name,
-        generation: newShoeData.generation,
+        ...newShoeData,
+        slug: createSlug(newShoeData.name),
         releaseDate: new Date(newShoeData.releaseDate),
-        description: newShoeData.description,
-        category: newShoeData.category,
-        terrain: newShoeData.terrain,
-        bestFor: newShoeData.bestFor,
-        imageUrl: newShoeData.imageUrl,
       },
     });
     if (!createdShoe) {
@@ -120,18 +96,14 @@ app.openapi(
   }
 );
 
-app.openapi(
+shoeRoute.openapi(
   {
     method: "delete",
     path: "/",
     description: "Delete all shoes",
     responses: {
-      200: {
-        description: "Successfully deleted all shoes",
-      },
-      404: {
-        description: "Failed to delete shoes",
-      },
+      200: { description: "Successfully deleted all shoes" },
+      404: { description: "Failed to delete shoes" },
     },
     tags: [TAGS],
   },
@@ -141,7 +113,7 @@ app.openapi(
   }
 );
 
-app.openapi(
+shoeRoute.openapi(
   {
     path: "/{id}",
     method: "delete",
@@ -150,12 +122,8 @@ app.openapi(
       params: ParamsByIdShoeSchema,
     },
     responses: {
-      200: {
-        description: "Shoe deleted successfully",
-      },
-      404: {
-        description: "Shoe not found",
-      },
+      200: { description: "Shoe deleted successfully" },
+      404: { description: "Shoe not found" },
     },
     tags: [TAGS],
   },
@@ -170,7 +138,7 @@ app.openapi(
   }
 );
 
-app.openapi(
+shoeRoute.openapi(
   {
     path: "/{id}",
     method: "patch",
@@ -178,48 +146,29 @@ app.openapi(
     request: {
       params: ParamsByIdShoeSchema,
       body: {
-        content: {
-          "application/json": {
-            schema: CreateShoeSchema,
-          },
-        },
+        content: { "shoeRoutelication/json": { schema: UpdateShoeSchema } },
       },
     },
     responses: {
       200: {
         description: "Shoe updated successfully",
-        content: {
-          "application/json": {
-            schema: CreateShoeSchema,
-          },
-        },
+        content: { "application/json": { schema: ShoeSchema } },
       },
-      404: {
-        description: "Shoe not found",
-      },
+      404: { description: "Shoe not found" },
     },
     tags: [TAGS],
   },
   async (c) => {
     const id = c.req.param("id") as string;
-    const bodyJson = c.req.valid("json");
-    const slugUpdate = createSlug(bodyJson.name);
+    const body = await c.req.json();
     const updateShoe = await prisma.shoe.update({
       where: { id },
       data: {
-        slug: slugUpdate,
-        name: bodyJson.name,
-        generation: bodyJson.generation,
-        releaseDate: new Date(bodyJson.releaseDate),
-        description: bodyJson.description,
-        category: bodyJson.category,
-        terrain: bodyJson.terrain,
-        bestFor: bodyJson.bestFor,
-        imageUrl: bodyJson.imageUrl,
+        ...body,
+        slug: createSlug(body.name),
+        releaseDate: new Date(body.releaseDate),
       },
     });
     return c.json(updateShoe);
   }
 );
-
-export default app;

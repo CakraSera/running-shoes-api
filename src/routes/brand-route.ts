@@ -2,9 +2,9 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { prisma } from "../lib/prisma";
 import { BrandSchema, SlugBrandSchema } from "../schemas/brand-schema";
 
-const app = new OpenAPIHono();
+export const brandRoute = new OpenAPIHono();
 
-app.openapi(
+brandRoute.openapi(
   {
     method: "get",
     path: "/",
@@ -35,7 +35,7 @@ app.openapi(
   }
 );
 
-app.openapi(
+brandRoute.openapi(
   {
     method: "get",
     path: "/{slug}",
@@ -47,7 +47,7 @@ app.openapi(
       200: {
         description: "Success Get a brand by slug",
         content: {
-          "application/json": {
+          "brandRoutelication/json": {
             schema: BrandSchema,
           },
         },
@@ -79,7 +79,7 @@ app.openapi(
   }
 );
 
-app.openapi(
+brandRoute.openapi(
   {
     method: "get",
     path: "/{slug}/shoes",
@@ -113,5 +113,3 @@ app.openapi(
     return c.json(brand?.shoes || []);
   }
 );
-
-export default app;
