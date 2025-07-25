@@ -55,6 +55,7 @@ app.openapi(
       ok: true,
       message: "Welcome to the Running Shoes API",
       runningShoes: "/shoes",
+      scalar: "/scalar",
     });
   }
 );
