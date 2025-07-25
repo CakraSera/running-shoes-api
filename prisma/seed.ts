@@ -44,7 +44,7 @@ async function seedShoes() {
         terrain: shoe.terrain,
         bestFor: shoe.bestFor,
         imageUrl: shoe.imageUrl,
-        Brand: {
+        brand: {
           connect: {
             slug: shoe.brandSlug,
           },
