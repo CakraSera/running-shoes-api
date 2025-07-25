@@ -48,6 +48,7 @@ app.openapi(
         },
       },
     },
+    tags: ["Index"],
   },
   (c) => {
     return c.json({
