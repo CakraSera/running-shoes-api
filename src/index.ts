@@ -58,9 +58,6 @@ app.doc("/docs", {
 
 app.use("/doc/*", prettyJSON());
 // Use the middleware to serve the Scalar API Reference at /scalar
-app.get(
-  "/scalar",
-  Scalar({ url: "/docs", theme: "kepler ", layout: "classic" })
-);
+app.get("/scalar", Scalar({ url: "/docs", theme: "kepler" }));
 
 export default app;
