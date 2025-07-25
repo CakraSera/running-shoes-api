@@ -125,9 +125,6 @@ app.openapi(
     method: "delete",
     path: "/",
     description: "Delete all shoes",
-    request: {
-      params: ParamsByIdShoeSchema,
-    },
     responses: {
       200: {
         description: "Successfully deleted all shoes",
@@ -206,9 +203,11 @@ app.openapi(
   async (c) => {
     const id = c.req.param("id") as string;
     const bodyJson = c.req.valid("json");
+    const slugUpdate = createSlug(bodyJson.name);
     const updateShoe = await prisma.shoe.update({
       where: { id },
       data: {
+        slug: slugUpdate,
         name: bodyJson.name,
         generation: bodyJson.generation,
         releaseDate: new Date(bodyJson.releaseDate),
