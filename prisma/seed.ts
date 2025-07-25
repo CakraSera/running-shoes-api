@@ -34,7 +34,7 @@ async function insertShoes() {
         },
       },
     });
-    console.info(`Inserted or updated shoe: ${upsertShoe.name}`);
+    console.info(`👟 Inserted or updated shoe: ${upsertShoe.name}`);
   }
 }
 
@@ -50,7 +50,7 @@ async function insertBrands() {
         slug: createSlug(brand.name),
       },
     });
-    console.info(`Inserted or updated brand: ${upsertBrand.name}`);
+    console.info(`🏷️ Inserted or updated brand: ${upsertBrand.name}`);
   }
 }
 
