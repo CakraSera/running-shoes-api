@@ -5,9 +5,31 @@ import { createSlug } from "../src/lib/slug";
 
 const prisma = new PrismaClient();
 
-async function insertShoes() {
+async function main() {
+  await seedBrands();
+  await seedShoes();
+}
+
+async function seedBrands() {
+  for (const brand of dataBrands) {
+    await prisma.brand.upsert({
+      where: {
+        name: brand.name,
+      },
+      update: {},
+      create: {
+        ...brand,
+        slug: createSlug(brand.name),
+      },
+    });
+
+    // TODO: log
+  }
+}
+
+async function seedShoes() {
   for (const shoe of dataShoes) {
-    await prisma.shoe.upsert({
+    const upsertedShoe = await prisma.shoe.upsert({
       where: {
         name: shoe.name,
       },
@@ -22,38 +44,16 @@ async function insertShoes() {
         terrain: shoe.terrain,
         bestFor: shoe.bestFor,
         imageUrl: shoe.imageUrl,
-        Brand: {
+        brand: {
           connect: {
             slug: shoe.brandSlug,
           },
         },
       },
     });
-  }
-}
 
-async function insertBrands() {
-  for (const brand of dataBrands) {
-    await prisma.brand.upsert({
-      where: {
-        name: brand.name,
-      },
-      update: {},
-      create: {
-        ...brand,
-        slug: createSlug(brand.name),
-      },
-    });
+    console.log(`👟 Shoe: ${upsertedShoe.name}`);
   }
-}
-
-async function main() {
-  console.log("Starting seeding process...");
-  await prisma.shoe.deleteMany({});
-  await prisma.brand.deleteMany({});
-  await insertBrands();
-  await insertShoes();
-  console.log("Seeding completed successfully!");
 }
 
 main()

@@ -5,20 +5,20 @@ import * as Sentry from "@sentry/bun";
 import z, { ZodError } from "zod";
 import { Scalar } from "@scalar/hono-api-reference";
 import { prettyJSON } from "hono/pretty-json";
-import { Prisma } from "./generated/prisma";
 
-// Route imports
-import Shoe from "./routes/shoe-route";
+import { Prisma } from "./generated/prisma";
+import { shoeRoute } from "./routes/shoe-route";
 import Brand from "./routes/brand-route";
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-});
+Sentry.init({ dsn: process.env.SENTRY_DSN });
 
 const app = new OpenAPIHono();
 
 app.use(logger());
+app.route("/shoes", shoeRoute);
+app.route("/brands", Brand); // TODO: rename to brandRoute
 
+// TODO: Move to root route / index route
 const WelcomeResponseSchema = z
   .object({
     ok: z.boolean(),
@@ -41,11 +41,7 @@ app.openapi(
     responses: {
       200: {
         description: "Welcome message",
-        content: {
-          "application/json": {
-            schema: WelcomeResponseSchema,
-          },
-        },
+        content: { "application/json": { schema: WelcomeResponseSchema } },
       },
     },
     tags: ["Index"],
@@ -79,12 +75,8 @@ app.onError((error, c) => {
   return c.json({ error: "An unexpected error occurred" }, 500);
 });
 
-app.route("/shoes", Shoe);
-app.route("/brands", Brand);
-
 // The OpenAPI documentation will be available at /doc
-const description =
-  "Running Shoes API - A RESTful API for managing running shoes and brands.";
+const description = "Running Shoes API - A RESTful API for managing running shoes and brands.";
 
 app.doc("/docs", {
   openapi: "3.0.0",
@@ -96,10 +88,13 @@ app.doc("/docs", {
 });
 
 app.use("/doc/*", prettyJSON());
-// Use the middleware to serve the Scalar API Reference at /scalar
+
 app.get(
   "/scalar",
-  Scalar({ url: "/docs", theme: "kepler ", layout: "classic" })
+  Scalar({
+    url: "/docs",
+    theme: "kepler",
+  })
 );
 
 export default app;

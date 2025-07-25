@@ -8,11 +8,7 @@ app.openapi(
   {
     method: "get",
     path: "/",
-    responses: {
-      200: {
-        description: "List of brands",
-      },
-    },
+    responses: { 200: { description: "List of brands" } },
     tags: ["Brands"],
   },
   async (c) => {
@@ -46,11 +42,7 @@ app.openapi(
     responses: {
       200: {
         description: "Success Get a brand by slug",
-        content: {
-          "application/json": {
-            schema: BrandSchema,
-          },
-        },
+        content: { "application/json": { schema: BrandSchema } },
       },
       400: {
         description: "Invalid slug format",
@@ -98,19 +90,14 @@ app.openapi(
   },
   async (c) => {
     const slug = c.req.param("slug");
+
     const brand = await prisma.brand.findUnique({
-      where: {
-        slug,
-      },
-      include: {
-        shoes: {
-          orderBy: {
-            name: "asc",
-          },
-        },
-      },
+      where: { slug },
+      include: { shoes: { orderBy: { name: "asc" } } },
     });
-    return c.json(brand?.shoes || []);
+    if (!brand) return c.notFound();
+
+    return c.json(brand.shoes);
   }
 );
 

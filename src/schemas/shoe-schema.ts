@@ -44,7 +44,6 @@ export const SlugShoeSchema = ShoeSchema.pick({
 export const ListArrayShoesSchema = z.array(ShoeSchema);
 
 export const CreateShoeSchema = ShoeSchema.pick({
-  brandId: true,
   name: true,
   generation: true,
   description: true,
@@ -53,9 +52,8 @@ export const CreateShoeSchema = ShoeSchema.pick({
   bestFor: true,
   imageUrl: true,
 }).extend({
-  releaseDate: z.iso.date().openapi({
-    example: "2023-01-04",
-  }),
+  brandId: z.string().min(3).max(100),
+  releaseDate: z.iso.date().openapi({ example: "2023-01-04" }),
 });
 
 export const UpdateShoeSchema = ShoeSchema.pick({
@@ -69,6 +67,7 @@ export const UpdateShoeSchema = ShoeSchema.pick({
   imageUrl: true,
 }).extend({
   brandId: z.string().min(3).max(100),
+  releaseDate: z.iso.date().openapi({ example: "2023-01-04" }),
 });
 
 export const SeedShoeSchema = ShoeSchema.pick({

@@ -45,7 +45,7 @@ model Shoe {
   imageUrl    String?
 
   brandId String
-  Brand   Brand  @relation(fields: [brandId], references: [id])
+  brand   Brand  @relation(fields: [brandId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
